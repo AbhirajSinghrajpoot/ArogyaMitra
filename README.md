@@ -1,164 +1,116 @@
-# ArogyaMitra
+# 🧘‍♂️ ArogyaMitra | AI Health & Fitness Companion
 
-Your personal health companion — built to help you eat better, train smarter, and stay consistent.
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-ArogyaMitra brings together workout planning, nutrition tracking, and real-time coaching into one clean interface. It uses large language models under the hood so the advice adapts to your goals, body metrics, and preferences — not generic templates.
+Welcome to **ArogyaMitra**, your personal, intelligent health companion built to help you eat better, train smarter, and stay consistent. 
 
----
-
-## What It Does
-
-- **Coach Chat** — Talk to an AI coach that understands your fitness context and gives actionable advice.
-- **Workout Plans** — Get personalized routines with embedded YouTube tutorial videos for every exercise.
-- **Nutrition Plans** — Receive macro-balanced meal plans tailored to your calorie targets.
-- **Health Dashboard** — See your BMI, BMR, and TDEE at a glance with clean visualizations.
-- **Progress Tracking** — Log your weight and workouts over time to track trends.
-- **Authentication** — Sign up with email, Google, or GitHub. Sessions are handled with JWTs.
-- **Calendar Sync** — Push workout sessions directly to Google Calendar.
+Instead of relying on generic templates, ArogyaMitra leverages Large Language Models (LLMs) under the hood to provide actionable, highly personalized fitness and nutrition advice that adapts to your specific goals, body metrics, and lifestyle.
 
 ---
 
-## Tech Stack
+## ✨ Core Features
+
+* 🤖 **AI Coach Chat:** Converse with an intelligent AI coach that understands your fitness context and provides real-time, actionable advice.
+* 🏋️ **Dynamic Workout Plans:** Generate personalized routines complete with embedded YouTube tutorial videos for every exercise.
+* 🥗 **Smart Nutrition Plans:** Receive macro-balanced meal plans meticulously tailored to your specific daily calorie targets.
+* 📊 **Health Dashboard:** Clean, interactive visualizations of your BMI, BMR, and TDEE using Recharts and Chart.js.
+* 📅 **Google Calendar Sync:** Push your generated workout sessions directly to your Google Calendar with a single click.
+* 🔐 **Robust Authentication:** Secure sign-ups via Email/Password, Google OAuth, or GitHub OAuth, managed via stateless JWT sessions.
+
+---
+
+## 🛠️ Tech Stack & Architecture
 
 **Frontend:** React 19, TypeScript, Vite, TailwindCSS, Recharts, Chart.js, Framer Motion
 
-**Backend:** Node.js, Express, TypeScript, better-sqlite3, JWT auth, bcrypt
+**Backend:** Node.js, Express, TypeScript, better-sqlite3, JWT Auth, bcrypt
 
-**External Services:** Groq (LLaMA 3.3 70B), Gemini, YouTube Data API, Google OAuth, GitHub OAuth, Clerk
+**External Integrations:** Groq (LLaMA 3.3 70B), Google Gemini, YouTube Data API, Google OAuth, GitHub OAuth, Clerk
 
----
-
-## Project Layout
+### 📂 Project Layout
+```text
+📦 arogyamitra
+ ┣ 📂 backend/
+ ┃ ┣ 📂 database/      # SQLite schema and connection logic
+ ┃ ┣ 📂 middleware/    # Auth and error-handling middleware
+ ┃ ┣ 📂 routes/        # Express REST API route handlers
+ ┃ ┣ 📂 services/      # AI integrations, YouTube API, and external services
+ ┃ ┗ 📜 server.ts      # Application entry point
+ ┣ 📂 frontend/
+ ┃ ┣ 📂 components/    # Reusable React UI components
+ ┃ ┣ 📂 pages/         # Route-level views
+ ┃ ┣ 📂 services/      # API client layer (Axios/Fetch)
+ ┃ ┗ 📜 App.tsx        # Root component and router
+ ┣ 📜 render.yaml      # Render deployment configuration
+ ┗ 📜 package.json
 
 ```
-arogyamitra/
-├── backend/
-│   ├── database/        # SQLite schema and connection
-│   ├── middleware/       # Auth middleware
-│   ├── routes/           # Express route handlers
-│   ├── services/         # AI integrations, YouTube, email
-│   └── server.ts         # App entry point
-├── frontend/
-│   ├── components/       # UI components
-│   ├── pages/            # Route-level views
-│   ├── services/         # API client layer
-│   ├── App.tsx           # Root component with routing
-│   └── main.tsx          # Vite entry
-├── .env.example          # Environment variable template
-├── render.yaml           # Render deployment config
-├── package.json
-└── README.md
-```
-
----
-
-## Getting Started
-
-### Requirements
-
-- Node.js v20 or later
-- npm v9 or later
-
-### Setup
-
+## 🛡️ Security-First Approach
+As a developer with a cybersecurity mindset, data protection is paramount in this application:
+ * **Zero Client-Side Keys:** All AI and third-party API calls are strictly executed server-side. No sensitive API keys ever reach the browser.
+ * **Encrypted Storage:** Passwords are salted and hashed using bcrypt (10 rounds) before hitting the database.
+ * **Data Sanitization:** The password_hash is explicitly stripped from all API responses to prevent data leaks.
+ * **Stateless Auth:** Secure session management utilizing HTTP-only, cryptographically signed JSON Web Tokens (JWTs).
+## 🌐 REST API Endpoints
+### 🔐 Authentication
+| Method | Route | Description |
+|---|---|---|
+| POST | /api/auth/register | Create a new user account |
+| POST | /api/auth/login | Authenticate user & receive JWT |
+| GET | /api/auth/google/url | Initiate Google OAuth flow |
+| GET | /api/auth/github/url | Initiate GitHub OAuth flow |
+### 🧠 AI Features (Protected Routes)
+| Method | Route | Description |
+|---|---|---|
+| POST | /api/workout/plan | Generate a customized workout plan |
+| POST | /api/nutrition/plan | Generate a macro-balanced meal plan |
+| POST | /api/coach/chat | Interact with the AI fitness coach |
+### 📅 Integrations (Protected Routes)
+| Method | Route | Description |
+|---|---|---|
+| POST | /api/google/calendar/schedule | Sync a workout to Google Calendar |
+## 🚀 Local Development Setup
+**1. Clone the repository:**
 ```bash
-git clone https://github.com/PRINCEk0001/arogyamitra.git
+git clone [https://github.com/AbhirajSinghrajpoot/arogyamitra.git](https://github.com/AbhirajSinghrajpoot/arogyamitra.git)
 cd arogyamitra
-npm install
-cp .env.example .env
+
 ```
+**2. Install dependencies:**
+```bash
+npm install
 
-Open `.env` and fill in your API keys (see the section below for where to get them).
+```
+**3. Environment Configuration:**
+```bash
+cp .env.example .env
 
-### Run Locally
-
+```
+Open the .env file and populate it with your API keys:
+ * **Groq/Gemini:** For AI coach generation.
+ * **YouTube Data API v3:** For fetching exercise tutorials.
+ * **Google/GitHub OAuth:** For authentication and calendar sync.
+ * **JWT Secret:** Generate a strong 32-character hex key.
+**4. Run the application:**
 ```bash
 npm run dev
+
 ```
-
-The app starts at **http://localhost:3000**.
-
----
-
-## API Keys You'll Need
-
-| Service | Required? | Where to Get It |
-|---------|-----------|-----------------|
-| **Groq** | Yes (or Gemini) | [console.groq.com](https://console.groq.com) → API Keys → Create New Key |
-| **Gemini** | Yes (or Groq) | [Google AI Studio](https://aistudio.google.com/apikey) → Create API Key |
-| **Clerk** | Yes | [clerk.com](https://clerk.com) → Create Application → Copy keys |
-| **YouTube Data API** | Optional | [Google Cloud Console](https://console.cloud.google.com) → Enable YouTube Data API v3 → Credentials → API Key |
-| **Google OAuth** | Optional (Calendar feature) | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client ID |
-| **GitHub OAuth** | Not active in current backend routes | GitHub → Settings → Developer Settings → OAuth Apps → New OAuth App |
-
-For Google OAuth, set the redirect URI to `http://localhost:3000/api/auth/google/callback`.
-For GitHub OAuth, set the callback URL to `http://localhost:3000/api/auth/github/callback`.
-
----
-
-## API Endpoints
-
-### Auth
-
-| Method | Route | What It Does |
-|--------|-------|--------------|
-| POST | `/api/auth/register` | Create a new account |
-| POST | `/api/auth/login` | Log in, receive a JWT |
-| GET | `/api/auth/google/url` | Start Google OAuth flow |
-| GET | `/api/auth/github/url` | Start GitHub OAuth flow |
-
-### User
-
-| Method | Route | What It Does |
-|--------|-------|--------------|
-| GET | `/api/users/profile` | Fetch your profile |
-| POST | `/api/users/profile` | Update your profile |
-
-### AI Features (auth required)
-
-| Method | Route | What It Does |
-|--------|-------|--------------|
-| POST | `/api/workout/plan` | Generate a workout plan |
-| POST | `/api/nutrition/plan` | Generate a meal plan |
-| POST | `/api/coach/chat` | Chat with the AI coach |
-
-### Calendar (auth required)
-
-| Method | Route | What It Does |
-|--------|-------|--------------|
-| POST | `/api/google/calendar/schedule` | Add a workout to Google Calendar |
-
----
-
-## Deploying to Render
-
-1. Push your code to GitHub.
-2. Go to [render.com](https://render.com) → New Web Service → connect this repo.
-3. Build Command: `npm install && npm run build`
-4. Start Command: `npm start`
-5. Add your environment variables in the Render dashboard (refer to `.env.example`).
-6. Deploy.
-
-A `render.yaml` is included to speed up the configuration.
-
-> **Note:** This app uses SQLite. On Render, attach a Persistent Disk so the database survives redeployments. For heavier production workloads, consider switching to PostgreSQL.
-
----
-
-## Security
-
-- The `.env` file is gitignored and never committed.
-- All AI and third-party API calls run server-side — no keys reach the browser.
-- Passwords are hashed with bcrypt (10 rounds).
-- `password_hash` is stripped from every API response.
-- Use a strong `JWT_SECRET` (at least 32 characters). Generate one with: `openssl rand -hex 32`
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE) for details.
-
----
-
-Built by **Prince Kori**
+The application will spin up at http://localhost:3000.
+## ☁️ Deployment (Render)
+This project is optimized for deployment on Render.
+ 1. Connect this repository to a new Render Web Service.
+ 2. Build Command: npm install && npm run build
+ 3. Start Command: npm start
+ 4. **Important:** Because this app uses SQLite, ensure you attach a **Persistent Disk** on Render so your database survives redeployments.
+## 👨‍💻 About the Developer
+**Abhiraj Singh Rajpoot** | *Software Engineer & Full-Stack Developer*
+Bridging the gap between scalable web development and system security. I build applications that not only solve real-world problems efficiently but also prioritize robust backend architectures and secure data flow.
+📫 **Let's Connect:**
+ * **Portfolio:** wizards-portfolio.vercel.app
+ * **LinkedIn:** Abhiraj Singh Rajpoot
+ * **GitHub:** @AbhirajSinghrajpoot
