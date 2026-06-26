@@ -1,6 +1,6 @@
 import express from 'express';
 import { google } from 'googleapis';
-import db from '../database/database.js';
+import pool from '../database/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { env, isGoogleCalendarConfigured } from '../config/env.js';
 
@@ -37,23 +37,21 @@ router.get('/auth/url', authenticateToken, ensureGoogleCalendarConfig, (req, res
 router.get('/auth/callback', ensureGoogleCalendarConfig, async (req, res) => {
   const { code, state } = req.query;
   if (!code || !state) return res.status(400).send("Missing code or state");
-  
+
   const userId = parseInt(state as string);
   const oauth2Client = getOAuthClient();
 
   try {
     const { tokens } = await oauth2Client.getToken(code as string);
-    
-    // Store tokens in DB
-    const stmt = db.prepare(`
+
+    await pool.query(`
       INSERT INTO google_tokens (user_id, access_token, refresh_token, expiry_date)
-      VALUES (?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4)
       ON CONFLICT(user_id) DO UPDATE SET
-        access_token = excluded.access_token,
-        refresh_token = COALESCE(excluded.refresh_token, google_tokens.refresh_token),
-        expiry_date = excluded.expiry_date
-    `);
-    stmt.run(userId, tokens.access_token, tokens.refresh_token, tokens.expiry_date);
+        access_token = EXCLUDED.access_token,
+        refresh_token = COALESCE(EXCLUDED.refresh_token, google_tokens.refresh_token),
+        expiry_date = EXCLUDED.expiry_date
+    `, [userId, tokens.access_token, tokens.refresh_token, tokens.expiry_date]);
 
     res.send(`
       <html>
@@ -78,7 +76,8 @@ router.get('/auth/callback', ensureGoogleCalendarConfig, async (req, res) => {
 
 router.get('/events', authenticateToken, ensureGoogleCalendarConfig, async (req, res) => {
   const userId = (req as any).user.userId;
-  const tokenData = db.prepare('SELECT * FROM google_tokens WHERE user_id = ?').get(userId) as any;
+  const result = await pool.query('SELECT * FROM google_tokens WHERE user_id = $1', [userId]);
+  const tokenData = result.rows[0];
 
   if (!tokenData) {
     return res.status(401).json({ error: "Calendar not connected" });
@@ -91,16 +90,13 @@ router.get('/events', authenticateToken, ensureGoogleCalendarConfig, async (req,
     expiry_date: tokenData.expiry_date
   });
 
-  // Check if token is expired and refresh if needed
   if (tokenData.expiry_date && Date.now() > tokenData.expiry_date && tokenData.refresh_token) {
     try {
       const { credentials } = await auth.refreshAccessToken();
-      const stmt = db.prepare(`
-        UPDATE google_tokens 
-        SET access_token = ?, expiry_date = ? 
-        WHERE user_id = ?
-      `);
-      stmt.run(credentials.access_token, credentials.expiry_date, userId);
+      await pool.query(
+        'UPDATE google_tokens SET access_token = $1, expiry_date = $2 WHERE user_id = $3',
+        [credentials.access_token, credentials.expiry_date, userId]
+      );
       auth.setCredentials(credentials);
     } catch (refreshError) {
       console.error("Token refresh error:", refreshError);
@@ -118,7 +114,6 @@ router.get('/events', authenticateToken, ensureGoogleCalendarConfig, async (req,
       singleEvents: true,
       orderBy: 'startTime',
     });
-
     res.json(response.data.items);
   } catch (error) {
     console.error("Fetch Events Error:", error);

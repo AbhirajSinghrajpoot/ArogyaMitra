@@ -1,7 +1,7 @@
 import express from 'express';
 import { calculateHealthStats } from '../services/healthLogic.js';
 import { generateNutritionPlanAI, analyzeFoodMacroAI } from '../services/aiService.js';
-import db from '../database/database.js';
+import pool from '../database/database.js';
 
 const router = express.Router();
 
@@ -28,11 +28,10 @@ router.post('/plan', async (req, res) => {
     });
 
     if (userId) {
-      const stmt = db.prepare(`
+      await pool.query(`
         INSERT INTO nutrition_plans (user_id, target_calories, target_protein, meals)
-        VALUES (?, ?, ?, ?)
-      `);
-      stmt.run(userId, targetCalories, targetProtein, JSON.stringify(plan));
+        VALUES ($1, $2, $3, $4)
+      `, [userId, targetCalories, targetProtein, JSON.stringify(plan)]);
     }
 
     res.json({ ...plan, targetCalories, targetProtein });

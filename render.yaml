@@ -30,4 +30,12 @@ services:
       - key: VITE_CLERK_PUBLISHABLE_KEY
         sync: false
       - key: DATABASE_URL
-        value: /opt/render/project/src/arogyamitra.db
+        fromDatabase:
+          name: arogyamitra-db
+          property: connectionString
+
+databases:
+  - name: arogyamitra-db
+    databaseName: arogyamitra
+    user: arogyamitra
+    plan: free

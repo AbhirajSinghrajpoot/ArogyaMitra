@@ -22,6 +22,7 @@ import discoverRoutes from './routes/discover.js';
 // import googleRoutes from './routes/google.js'; // Removed for Clerk
 import calendarRoutes from './routes/calendar.js';
 import { env, validateEnvironment } from './config/env.js';
+import { initDB } from './database/database.js';
 
 import { clerkMiddleware } from '@clerk/express';
 
@@ -96,6 +97,9 @@ const corsOptions: cors.CorsOptions = {
 async function startServer() {
   const app = express();
   const PORT = env.port;
+
+  // ─── Initialize Database ───────────────────────────────────────────────────
+  await initDB();
 
   // ─── Security Headers (Helmet) ─────────────────────────────────────────────
   // Step 4: CSP must explicitly allow YouTube frame-src, otherwise Error 153 occurs

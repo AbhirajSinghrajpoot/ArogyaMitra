@@ -1,11 +1,11 @@
 import express from 'express';
 import { calculateHealthStats } from '../services/healthLogic.js';
-import db from '../database/database.js';
+import pool from '../database/database.js';
 import { getHealthInsight } from '../services/aiService.js';
 
 const router = express.Router();
 
-router.post('/calc', (req, res) => {
+router.post('/calc', async (req, res) => {
   const { profile, userId } = req.body;
 
   if (!profile) {
@@ -16,11 +16,10 @@ router.post('/calc', (req, res) => {
     const stats = calculateHealthStats(profile);
 
     if (userId) {
-      const stmt = db.prepare(`
+      await pool.query(`
         INSERT INTO health_assessments (user_id, bmi, bmr, tdee, category)
-        VALUES (?, ?, ?, ?, ?)
-      `);
-      stmt.run(userId, stats.bmi, stats.bmr, stats.tdee, stats.category);
+        VALUES ($1, $2, $3, $4, $5)
+      `, [userId, stats.bmi, stats.bmr, stats.tdee, stats.category]);
     }
 
     res.json(stats);
