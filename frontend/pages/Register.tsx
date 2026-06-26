@@ -39,8 +39,8 @@ export const Register: React.FC<RegisterProps> = () => {
 
       {/* Developer Credit */}
       <div className="mt-12 flex flex-col items-center justify-center gap-1 opacity-30">
-        <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-slate-500">Developed & Crafted by</p>
-        <p className="text-[10px] font-bold text-primary tracking-widest">PRINCE KORI</p>
+        <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-slate-500">Powered by WIZARD</p>
+        <p className="text-[10px] font-bold text-primary tracking-widest">Wing</p>
       </div>
     </div>
   );
